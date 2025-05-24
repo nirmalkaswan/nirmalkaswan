@@ -16,7 +16,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const response = await fetch('${API_BASE_URL}/api/users/add-user', {
+    const response = await fetch(`${API_BASE_URL}/api/users/add-user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
