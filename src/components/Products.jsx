@@ -26,7 +26,7 @@ const ProductManager = () => {
 
   
   const fetchProducts = () => {
-    fetch('${API_BASE_URL}/api/products')
+    fetch(`${API_BASE_URL}/api/products`)
       .then((res) => res.json())
       .then((data) => {
         console.log('Fetched products:', data);
@@ -86,7 +86,7 @@ const ProductManager = () => {
     });
 
 
-    fetch('${API_BASE_URL}/api/products/add-product', {
+    fetch(`${API_BASE_URL}/api/products/add-product`, {
       method: 'POST',
       body: data,
     })
@@ -117,7 +117,7 @@ const ProductManager = () => {
   };
 
 const handleAddToSale = (product) => {
-  fetch('${API_BASE_URL}/api/products/add-sale', {
+  fetch(`${API_BASE_URL}/api/products/add-sale`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -12,7 +12,7 @@ function UserList() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('${API_BASE_URL}/api/users');
+      const res = await fetch(`${API_BASE_URL}/api/users`);
       const data = await res.json();
       if (res.ok) {
         setUsers(data.users || []);
