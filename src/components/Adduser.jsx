@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function Adduser() {
   const [formData, setFormData] = useState({
     name: '',
@@ -16,7 +17,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const response = await fetch('http://localhost:5000/api/users/add-user', {
+    const response = await fetch('${API_BASE_URL}/api/users/add-user', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const ProductManager = () => {
   const [products, setProducts] = useState([]);
   const [addFormData, setAddFormData] = useState({
@@ -25,7 +26,7 @@ const ProductManager = () => {
 
   
   const fetchProducts = () => {
-    fetch('http://localhost:5000/api/products')
+    fetch('${API_BASE_URL}/api/products')
       .then((res) => res.json())
       .then((data) => {
         console.log('Fetched products:', data);
@@ -85,7 +86,7 @@ const ProductManager = () => {
     });
 
 
-    fetch('http://localhost:5000/api/products/add-product', {
+    fetch('${API_BASE_URL}/api/products/add-product', {
       method: 'POST',
       body: data,
     })
@@ -116,7 +117,7 @@ const ProductManager = () => {
   };
 
 const handleAddToSale = (product) => {
-  fetch('http://localhost:5000/api/products/add-sale', {
+  fetch('${API_BASE_URL}/api/products/add-sale', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -144,7 +145,7 @@ const handleAddToSale = (product) => {
     setEditPreviewUrls(
       product.photos.map((p) => ({
         id: uuidv4(),
-        url: `http://localhost:5000/${p.startsWith('/') ? p.slice(1) : p}`,
+        url: `${API_BASE_URL}/${p.startsWith('/') ? p.slice(1) : p}`,
       }))
     );
   };
@@ -180,7 +181,7 @@ const handleAddToSale = (product) => {
       data.append('photos', photo);
     });
 
-    fetch(`http://localhost:5000/api/products/${editingProductId}`, {
+    fetch(`${API_BASE_URL}/api/products/${editingProductId}`, {
       method: 'PUT',
       body: data,
     })
@@ -228,7 +229,7 @@ const handleAddToSale = (product) => {
   const handleRemove = (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
 
-    fetch(`http://localhost:5000/api/products/${id}`, {
+    fetch(`${API_BASE_URL}/api/products/${id}`, {
       method: 'DELETE',
     })
       .then((res) => {
@@ -538,40 +539,19 @@ const handleAddToSale = (product) => {
         Product List
       </h1>
       <ul style={{ listStyle: 'none', padding: 0 }}>
-        {products.map((product) => (
+         {products.map((product) => (
           <li
             key={product._id}
-         
-            style={{
-              border: '1px solid #e0e0e0',
-              marginBottom: 20,
-              borderRadius: 8,
-              padding: 15,
-              background: '#fff',
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
-            }}
+            className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
           >
             {editingProductId === product._id ? (
               <form
                 onSubmit={handleEditSubmit}
                 encType="multipart/form-data"
-                style={{
-                  background: '#fff',
-                  padding: 20,
-                  borderRadius: 8,
-                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                }}
+                className="bg-white p-6 rounded-xl shadow-inner"
               >
-                <div style={{ marginBottom: 20 }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      color: '#444',
-                    }}
-                  >
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Product Name
                     <input
                       type="text"
@@ -579,30 +559,12 @@ const handleAddToSale = (product) => {
                       value={editFormData.name}
                       onChange={handleEditChange}
                       required
-                      style={{
-                        width: '100%',
-                        padding: 12,
-                        fontSize: '1rem',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: 8,
-                        outline: 'none',
-                        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-                      }}
-                      onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
-                      onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     />
                   </label>
                 </div>
-                <div style={{ marginBottom: 20 }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      color: '#444',
-                    }}
-                  >
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price
                     <input
                       type="number"
@@ -610,30 +572,12 @@ const handleAddToSale = (product) => {
                       value={editFormData.price}
                       onChange={handleEditChange}
                       required
-                      style={{
-                        width: '100%',
-                        padding: 12,
-                        fontSize: '1rem',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: 8,
-                        outline: 'none',
-                        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-                      }}
-                      onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
-                      onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     />
                   </label>
                 </div>
-                <div style={{ marginBottom: 20 }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      color: '#444',
-                    }}
-                  >
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Colors (comma-separated)
                     <input
                       type="text"
@@ -641,48 +585,19 @@ const handleAddToSale = (product) => {
                       value={editFormData.colors}
                       onChange={handleEditChange}
                       required
-                      style={{
-                        width: '100%',
-                        padding: 12,
-                        fontSize: '1rem',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: 8,
-                        outline: 'none',
-                        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-                      }}
-                      onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
-                      onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     />
                   </label>
                 </div>
-                <div style={{ marginBottom: 20 }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      color: '#444',
-                    }}
-                  >
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Category
                     <select
                       name="category"
                       value={editFormData.category}
                       onChange={handleEditChange}
                       required
-                      style={{
-                        width: '100%',
-                        padding: 12,
-                        fontSize: '1rem',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: 8,
-                        outline: 'none',
-                        background: '#fff',
-                        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-                      }}
-                      onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
-                      onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     >
                       <option value="">Select a Category</option>
                       <option value="AC Comforters">AC Comforters</option>
@@ -693,34 +608,14 @@ const handleAddToSale = (product) => {
                     </select>
                   </label>
                 </div>
-                <div style={{ marginBottom: 20 }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      marginBottom: 8,
-                      color: '#444',
-                    }}
-                  >
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Photos (optional to replace)
                     <div
-                      style={{
-                        border: '2px dashed #e0e0e0',
-                        borderRadius: 8,
-                        padding: 20,
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        transition: 'border-color 0.3s ease',
-                        background: '#f9fafb',
-                      }}
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        e.currentTarget.style.borderColor = '#4a90e2';
-                      }}
-                      onDragLeave={(e) => {
-                        e.currentTarget.style.borderColor = '#e0e0e0';
-                      }}
+                      className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition"
+                      onDragOver={(e) => e.preventDefault()}
+                      onDragLeave={(e) => e.currentTarget.classList.remove('border-blue-500')}
+                      onDrop={(e) => e.currentTarget.classList.remove('border-blue-500')}
                     >
                       <input
                         type="file"
@@ -728,42 +623,30 @@ const handleAddToSale = (product) => {
                         multiple
                         accept="image/*"
                         onChange={handleEditChange}
-                        style={{ display: 'none' }}
+                        className="hidden"
                         id="edit-photo-upload"
                       />
                       <label
                         htmlFor="edit-photo-upload"
-                        style={{
-                          display: 'block',
-                          fontSize: '0.9rem',
-                          color: '#666',
-                          cursor: 'pointer',
-                        }}
+                        className="text-gray-500 cursor-pointer"
                       >
                         Drag and drop images here or click to upload
                       </label>
                     </div>
                   </label>
-                  <div style={{ display: 'flex', gap: 12, marginTop: 15, flexWrap: 'wrap' }}>
+                  <div className="flex flex-wrap gap-4 mt-4">
                     {editPreviewUrls.length === 0 && (
-                      <p style={{ color: '#666', fontSize: '0.9rem' }}>No images selected</p>
+                      <p className="text-gray-500 text-sm">No images selected</p>
                     )}
                     {editPreviewUrls.map((item) => (
                       <div
                         key={item.id}
-                        style={{
-                          position: 'relative',
-                          width: 100,
-                          height: 100,
-                          borderRadius: 8,
-                          overflow: 'hidden',
-                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                        }}
+                        className="w-24 h-24 rounded-lg overflow-hidden shadow-md"
                       >
                         <img
                           src={item.url}
                           alt={`edit-preview-${item.id}`}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          className="w-full h-full object-cover"
                           onError={(e) => {
                             console.error(`Failed to load image: ${item.url}`);
                             e.target.src = 'https://via.placeholder.com/100?text=Image+Not+Found';
@@ -773,145 +656,57 @@ const handleAddToSale = (product) => {
                     ))}
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  style={{
-                    padding: '12px 24px',
-                    fontSize: '1rem',
-                    fontWeight: 500,
-                    background: '#4a90e2',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 8,
-                    cursor: 'pointer',
-                    marginRight: 10,
-                    transition: 'background 0.3s ease, transform 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => (e.target.style.background = '#357abd')}
-                  onMouseLeave={(e) => (e.target.style.background = '#4a90e2')}
-                  onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
-                  onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancelEdit}
-                  style={{
-                    padding: '12px 24px',
-                    fontSize: '1rem',
-                    fontWeight: 500,
-                    background: '#e0e0e0',
-                    color: '#333',
-                    border: 'none',
-                    borderRadius: 8,
-                    cursor: 'pointer',
-                    transition: 'background 0.3s ease, transform 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => (e.target.style.background = '#d0d0d0')}
-                  onMouseLeave={(e) => (e.target.style.background = '#e0e0e0')}
-                  onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
-                  onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
-                >
-                  Cancel
-                </button>
+                <div className="flex gap-4">
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </form>
             ) : (
               <>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 900, margin: '0 0 10px' }}>
-                  {product.name}
-                </h2>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 500, margin: '0 0 10px' }}>
-                  {product.description} hi
-                </h2>
-             <h1>
-  {new Date(product.createAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })}
-</h1>
-
-                <p>Price: ${product.price}</p>
-                <p>Colors: {product.colors.join(', ')}</p>
-                <p>Category: {product.category}</p>
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
+                <h2 className="text-xl font-semibold text-gray-800 mb-3">{product.name}</h2>
+                <p className="text-gray-600">Price: ${product.price}</p>
+                <p className="text-gray-600">Colors: {product.colors.join(', ')}</p>
+                <p className="text-gray-600">Category: {product.category}</p>
+                <div className="flex flex-wrap gap-4 mt-4">
                   {product.photos.length === 0 && (
-                    <p style={{ color: '#666', fontSize: '0.9rem' }}>No images available</p>
+                    <p className="text-gray-500 text-sm">No images available</p>
                   )}
-                {product.photos.map((photo, index) => (
-  <img
-    key={index}
-    src={photo} 
-    alt={`Product ${index + 1}`}
-    className="w-full h-80 object-cover rounded-2xl shadow-lg transition-transform duration-300 hover:scale-105"
-    loading="lazy"
-    onError={(e) => { e.target.style.display = 'none'; }}
-  />
-))}
-
+                  {product.photos.map((photo, index) => (
+                    <img
+                      key={index}
+                      src={photo}
+                      alt={`Product ${index + 1}`}
+                      className="w-24 h-24 object-cover rounded-lg shadow-md hover:scale-105 transition"
+                      onError={(e) => {
+                        console.error(`Failed to load image: ${photo}`);
+                        e.target.src = 'https://via.placeholder.com/100?text=Image+Not+Found';
+                      }}
+                    />
+                  ))}
                 </div>
-                <div style={{ marginTop: 10 }}>
+                <div className="mt-4 flex gap-4">
                   <button
                     onClick={() => handleEditClick(product)}
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      background: '#4a90e2',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      marginRight: 10,
-                      transition: 'background 0.3s ease, transform 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => (e.target.style.background = '#357abd')}
-                    onMouseLeave={(e) => (e.target.style.background = '#4a90e2')}
-                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
-                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+                    className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleRemove(product._id)}
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      background: '#e63946',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      transition: 'background 0.3s ease, transform 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
-                    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
-                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
-                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+                    className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition"
                   >
                     Remove
-                  </button>
-                  <button
-                    onClick={() =>handleAddToSale(product)}
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      background: 'green',
-                      color: 'black',
-                      border: 'none',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      transition: 'background 0.3s ease, transform 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
-                    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
-                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
-                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
-                  >
-                   Add to sale
                   </button>
                 </div>
               </>

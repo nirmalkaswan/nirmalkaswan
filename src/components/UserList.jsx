@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 function UserList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +12,7 @@ function UserList() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/users');
+      const res = await fetch('${API_BASE_URL}/api/users');
       const data = await res.json();
       if (res.ok) {
         setUsers(data.users || []);
@@ -29,7 +30,7 @@ function UserList() {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/${id}`, {
         method: 'DELETE',
       });
 
