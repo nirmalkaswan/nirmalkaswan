@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 const ProductManager = () => {
   const [products, setProducts] = useState([]);
   const [addFormData, setAddFormData] = useState({
@@ -9,7 +10,7 @@ const ProductManager = () => {
     price: '',
     colors: '',
     category: '',
-    description:'',
+    description: '',
     photos: [],
   });
   const [addPreviewUrls, setAddPreviewUrls] = useState([]);
@@ -19,12 +20,11 @@ const ProductManager = () => {
     price: '',
     colors: '',
     category: '',
-     description:'',
+    description: '',
     photos: [],
   });
   const [editPreviewUrls, setEditPreviewUrls] = useState([]);
 
-  
   const fetchProducts = () => {
     fetch(`${API_BASE_URL}/api/products`)
       .then((res) => res.json())
@@ -39,7 +39,6 @@ const ProductManager = () => {
     fetchProducts();
   }, []);
 
-
   useEffect(() => {
     console.log('addPreviewUrls:', addPreviewUrls);
     console.log('editPreviewUrls:', editPreviewUrls);
@@ -48,7 +47,6 @@ const ProductManager = () => {
     });
   }, [addPreviewUrls, editPreviewUrls, products]);
 
-  // Clean up object URLs to prevent memory leaks
   useEffect(() => {
     return () => {
       addPreviewUrls.forEach((item) => URL.revokeObjectURL(item.url));
@@ -56,7 +54,6 @@ const ProductManager = () => {
     };
   }, [addPreviewUrls, editPreviewUrls]);
 
-  // Handle input changes for adding a product
   const handleAddChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'photos') {
@@ -72,7 +69,6 @@ const ProductManager = () => {
     }
   };
 
-  // Handle form submission for adding a product
   const handleAddSubmit = (e) => {
     e.preventDefault();
     const data = new FormData();
@@ -80,11 +76,10 @@ const ProductManager = () => {
     data.append('price', addFormData.price);
     data.append('colors', addFormData.colors);
     data.append('category', addFormData.category);
-    data.append('description',addFormData.description)
+    data.append('description', addFormData.description);
     addFormData.photos.forEach((photo) => {
       data.append('photos', photo);
     });
-
 
     fetch(`${API_BASE_URL}/api/products/add-product`, {
       method: 'POST',
@@ -93,13 +88,12 @@ const ProductManager = () => {
       .then((res) => {
         if (res.ok) {
           alert('Product added successfully!');
-          console.log("sss",addFormData)
           setAddFormData({
             name: '',
             price: '',
             colors: '',
             category: '',
-            description:'',
+            description: '',
             photos: [],
           });
           setAddPreviewUrls([]);
@@ -116,41 +110,67 @@ const ProductManager = () => {
       });
   };
 
-const handleAddToSale = (product) => {
-  fetch(`${API_BASE_URL}/api/products/add-sale`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ _id: product._id }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log('Product marked as on sale:', data);
-      // Optionally update state or show toast
+  const handleAddToSale = (product) => {
+    fetch(`${API_BASE_URL}/api/products/add-sale`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ _id: product._id }),
     })
-    .catch((err) => console.error('Error:', err));
-};const handleremoveToSale = (product) => {
-  fetch(`${API_BASE_URL}/api/products/remove-sale`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ _id: product._id }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log('Product marked as on sale:', data);
-      // Optionally update state or show toast
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((err) => {
+            throw new Error(err.message || 'Failed to mark product as on sale');
+          });
+        }
+      })
+      .then((data) => {
+        console.log('Product marked as on sale:', data);
+        alert('Product marked as on sale!');
+        fetchProducts();
+      })
+      .catch((err) => {
+        console.error('Error:', err);
+        alert(`Failed to mark product as on sale: ${err.message}`);
+      });
+  };
+
+  const handleremoveToSale = (id) => {
+    fetch(`${API_BASE_URL}/api/products/remove-sale`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ _id: id }),
     })
-    .catch((err) => console.error('Error:', err));
-};
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          return res.json().then((err) => {
+            throw new Error(err.message || 'Failed to remove product from sale');
+          });
+        }
+      })
+      .then((data) => {
+        console.log('Product removed from sale:', data);
+        alert('Product removed from sale!');
+        fetchProducts();
+      })
+      .catch((err) => {
+        console.error('Error:', err);
+        alert(`Failed to remove product from sale: ${err.message}`);
+      });
+  };
 
   const handleEditClick = (product) => {
     setEditingProductId(product._id);
     setEditFormData({
       name: product.name,
-       description:product.description,
+      description: product.description,
       price: product.price,
       colors: product.colors.join(', '),
       category: product.category,
@@ -164,7 +184,6 @@ const handleAddToSale = (product) => {
     );
   };
 
-  // Handle input changes for editing a product
   const handleEditChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'photos') {
@@ -180,14 +199,13 @@ const handleAddToSale = (product) => {
     }
   };
 
-  // Handle form submission for editing a product
   const handleEditSubmit = (e) => {
     e.preventDefault();
     if (!editingProductId) return;
 
     const data = new FormData();
     data.append('name', editFormData.name);
-    data.append('description',editFormData.description)
+    data.append('description', editFormData.description);
     data.append('price', editFormData.price);
     data.append('colors', editFormData.colors);
     data.append('category', editFormData.category);
@@ -208,7 +226,7 @@ const handleAddToSale = (product) => {
             price: '',
             colors: '',
             category: '',
-             description:'',
+            description: '',
             photos: [],
           });
           setEditPreviewUrls([]);
@@ -225,13 +243,12 @@ const handleAddToSale = (product) => {
       });
   };
 
-
   const handleCancelEdit = () => {
     setEditingProductId(null);
     setEditFormData({
       name: '',
       price: '',
-       description:'',
+      description: '',
       colors: '',
       category: '',
       photos: [],
@@ -239,7 +256,6 @@ const handleAddToSale = (product) => {
     setEditPreviewUrls([]);
   };
 
-  
   const handleRemove = (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
 
@@ -248,6 +264,7 @@ const handleAddToSale = (product) => {
     })
       .then((res) => {
         if (res.ok) {
+          alert('Product deleted successfully!');
           fetchProducts();
         } else {
           return res.json().then((err) => {
@@ -295,6 +312,7 @@ const handleAddToSale = (product) => {
               value={addFormData.name}
               onChange={handleAddChange}
               required
+              aria-label="Product name"
               style={{
                 width: '100%',
                 padding: 12,
@@ -327,6 +345,7 @@ const handleAddToSale = (product) => {
               value={addFormData.price}
               onChange={handleAddChange}
               required
+              aria-label="Product price"
               style={{
                 width: '100%',
                 padding: 12,
@@ -360,6 +379,7 @@ const handleAddToSale = (product) => {
               onChange={handleAddChange}
               placeholder="e.g. Red, Blue, White"
               required
+              aria-label="Product colors"
               style={{
                 width: '100%',
                 padding: 12,
@@ -391,6 +411,7 @@ const handleAddToSale = (product) => {
               value={addFormData.category}
               onChange={handleAddChange}
               required
+              aria-label="Product category"
               style={{
                 width: '100%',
                 padding: 12,
@@ -412,7 +433,8 @@ const handleAddToSale = (product) => {
               <option value="Essential Collection">Essential Collection</option>
             </select>
           </label>
-        </div> <div style={{ marginBottom: 20 }}>
+        </div>
+        <div style={{ marginBottom: 20 }}>
           <label
             style={{
               display: 'block',
@@ -422,12 +444,13 @@ const handleAddToSale = (product) => {
               color: '#444',
             }}
           >
-            Dscription
+            Description
             <textarea
               name="description"
               value={addFormData.description}
               onChange={handleAddChange}
               required
+              aria-label="Product description"
               style={{
                 width: '100%',
                 padding: 12,
@@ -440,8 +463,7 @@ const handleAddToSale = (product) => {
               }}
               onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
               onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
-            >
-            </textarea>
+            />
           </label>
         </div>
 
@@ -544,6 +566,7 @@ const handleAddToSale = (product) => {
           onMouseLeave={(e) => (e.target.style.background = '#4a90e2')}
           onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
           onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+          aria-label="Add product"
         >
           Add Product
         </button>
@@ -553,7 +576,7 @@ const handleAddToSale = (product) => {
         Product List
       </h1>
       <ul style={{ listStyle: 'none', padding: 0 }}>
-         {products.map((product) => (
+        {products.map((product) => (
           <li
             key={product._id}
             className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
@@ -574,6 +597,7 @@ const handleAddToSale = (product) => {
                       onChange={handleEditChange}
                       required
                       className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      aria-label="Edit product name"
                     />
                   </label>
                 </div>
@@ -587,6 +611,7 @@ const handleAddToSale = (product) => {
                       onChange={handleEditChange}
                       required
                       className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      aria-label="Edit product price"
                     />
                   </label>
                 </div>
@@ -600,6 +625,7 @@ const handleAddToSale = (product) => {
                       onChange={handleEditChange}
                       required
                       className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      aria-label="Edit product colors"
                     />
                   </label>
                 </div>
@@ -612,6 +638,7 @@ const handleAddToSale = (product) => {
                       onChange={handleEditChange}
                       required
                       className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      aria-label="Edit product category"
                     >
                       <option value="">Select a Category</option>
                       <option value="AC Comforters">AC Comforters</option>
@@ -674,6 +701,7 @@ const handleAddToSale = (product) => {
                   <button
                     type="submit"
                     className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+                    aria-label="Save product changes"
                   >
                     Save
                   </button>
@@ -681,6 +709,7 @@ const handleAddToSale = (product) => {
                     type="button"
                     onClick={handleCancelEdit}
                     className="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 transition"
+                    aria-label="Cancel editing"
                   >
                     Cancel
                   </button>
@@ -692,6 +721,7 @@ const handleAddToSale = (product) => {
                 <p className="text-gray-600">Price: ${product.price}</p>
                 <p className="text-gray-600">Colors: {product.colors.join(', ')}</p>
                 <p className="text-gray-600">Category: {product.category}</p>
+                <p className="text-gray-600">Sale: {product.sale ? 'Yes' : 'No'}</p>
                 <div className="flex flex-wrap gap-4 mt-4">
                   {product.photos.length === 0 && (
                     <p className="text-gray-500 text-sm">No images available</p>
@@ -699,7 +729,7 @@ const handleAddToSale = (product) => {
                   {product.photos.map((photo, index) => (
                     <img
                       key={index}
-                      src={photo}
+                      src={`${API_BASE_URL}/${photo.startsWith('/') ? photo.slice(1) : photo}`}
                       alt={`Product ${index + 1}`}
                       className="w-24 h-24 object-cover rounded-lg shadow-md hover:scale-105 transition"
                       onError={(e) => {
@@ -713,55 +743,63 @@ const handleAddToSale = (product) => {
                   <button
                     onClick={() => handleEditClick(product)}
                     className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+                    aria-label={`Edit product ${product.name}`}
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleRemove(product._id)}
                     className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition"
+                    aria-label={`Remove product ${product.name}`}
                   >
                     Remove
                   </button>
-                  <button
-                    onClick={() =>handleAddToSale(product)}
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      background: 'green',
-                      color: 'black',
-                      border: 'none',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      transition: 'background 0.3s ease, transform 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
-                    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
-                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
-                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
-                  >
-                   Add to sale
-                  </button>
-                  <button
-                    onClick={() =>handleremoveToSale(product)}
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      background: 'green',
-                      color: 'black',
-                      border: 'none',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      transition: 'background 0.3s ease, transform 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
-                    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
-                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
-                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
-                  >
-                   remove from sale
-                  </button>
+                  {!product.sale && (
+                    <button
+                      onClick={() => handleAddToSale(product)}
+                      style={{
+                        padding: '8px 16px',
+                        fontSize: '1rem',
+                        fontWeight: 500,
+                        background: '#28a745',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 8,
+                        cursor: 'pointer',
+                        transition: 'background 0.3s ease, transform 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => (e.target.style.background = '#218838')}
+                      onMouseLeave={(e) => (e.target.style.background = '#28a745')}
+                      onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                      onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+                      aria-label={`Add product ${product.name} to sale`}
+                    >
+                      Add to Sale
+                    </button>
+                  )}
+                  {product.sale === true && (
+                    <button
+                      onClick={() => handleremoveToSale(product._id)}
+                      style={{
+                        padding: '8px 16px',
+                        fontSize: '1rem',
+                        fontWeight: 500,
+                        background: '#dc3545',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 8,
+                        cursor: 'pointer',
+                        transition: 'background 0.3s ease, transform 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => (e.target.style.background = '#c82333')}
+                      onMouseLeave={(e) => (e.target.style.background = '#dc3545')}
+                      onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                      onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+                      aria-label={`Remove product ${product.name} from sale`}
+                    >
+                      Remove from Sale
+                    </button>
+                  )}
                 </div>
               </>
             )}
