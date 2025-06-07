@@ -130,6 +130,20 @@ const handleAddToSale = (product) => {
       // Optionally update state or show toast
     })
     .catch((err) => console.error('Error:', err));
+};const handleremoveToSale = (product) => {
+  fetch(`${API_BASE_URL}/api/products/remove-sale`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ _id: product._id }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('Product marked as on sale:', data);
+      // Optionally update state or show toast
+    })
+    .catch((err) => console.error('Error:', err));
 };
 
   const handleEditClick = (product) => {
@@ -727,6 +741,26 @@ const handleAddToSale = (product) => {
                     onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
                   >
                    Add to sale
+                  </button>
+                  <button
+                    onClick={() =>handleremoveToSale(product)}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      background: 'green',
+                      color: 'black',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      transition: 'background 0.3s ease, transform 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
+                    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
+                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+                  >
+                   remove from sale
                   </button>
                 </div>
               </>
