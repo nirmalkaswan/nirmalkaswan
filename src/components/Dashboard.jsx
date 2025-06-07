@@ -20,6 +20,9 @@ function Dashboard() {
               <Link to="/categories" className="block hover:bg-blue-100 px-4 py-2 rounded-md">📂 Categories</Link>
             </li>
             <li>
+              <Link to="/sale" className="block hover:bg-blue-100 px-4 py-2 rounded-md">📂SALE</Link>
+            </li>
+            <li>
               <Link to="/admins" className="block hover:bg-blue-100 px-4 py-2 rounded-md">🛡️ Admins</Link>
             </li>
           </ul>

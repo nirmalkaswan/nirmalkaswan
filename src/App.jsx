@@ -6,6 +6,7 @@ import Products from './components/Products';
 import AdminAllOrders from './components/AdminAllOrders';
 import Admins from './components/Admins';
 import Adduser from './components/Adduser';
+import Sale from './components/Sale';
 export default function App() {
   return (
     <Routes>
@@ -15,6 +16,8 @@ export default function App() {
       <Route path="/categories" element={<AdminAllOrders/>} />
       <Route path="/admins" element={<Admins />} />
       <Route path="/Adduser" element={   <Adduser />} />
+      <Route path="/Sale" element={<Sale />} />
+
     </Routes>
   );
 }

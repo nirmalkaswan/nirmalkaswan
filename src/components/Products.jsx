@@ -243,9 +243,10 @@ const handleAddToSale = (product) => {
         console.error('Delete product error:', err);
         alert(`Failed to delete product: ${err.message}`);
       });
-  };};const handleremoveToSale = (id) => {
+  };};
+  const handleremoveToSale = (product) => {
   fetch(`${API_BASE_URL}/api/products/remove-sale`, {
-    method: 'DELETE',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -741,9 +742,9 @@ const handleAddToSale = (product) => {
                   >
                    Add to sale
                   </button>
-                 {product.sale==true && (
+                 
   <button
-    onClick={() => handleremoveToSale(product._id)}
+    onClick={() => handleremoveToSale(product)}
     style={{
       padding: '8px 16px',
       fontSize: '1rem',
@@ -762,7 +763,7 @@ const handleAddToSale = (product) => {
   >
     Remove from Sale
   </button>
-)}
+
 
                 </div>
               </>
