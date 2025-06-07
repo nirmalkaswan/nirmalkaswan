@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-// Define API base URL using environment variable with fallback
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 const ProductManager = () => {
   const [products, setProducts] = useState([]);
   const [addFormData, setAddFormData] = useState({
@@ -10,6 +8,7 @@ const ProductManager = () => {
     price: '',
     colors: '',
     category: '',
+    description:'',
     photos: [],
   });
   const [addPreviewUrls, setAddPreviewUrls] = useState([]);
@@ -19,13 +18,14 @@ const ProductManager = () => {
     price: '',
     colors: '',
     category: '',
+     description:'',
     photos: [],
   });
   const [editPreviewUrls, setEditPreviewUrls] = useState([]);
 
-  // Fetch products from the server
+  
   const fetchProducts = () => {
-    fetch(`${API_BASE_URL}/api/products`)
+    fetch('http://localhost:5000/api/products')
       .then((res) => res.json())
       .then((data) => {
         console.log('Fetched products:', data);
@@ -38,7 +38,7 @@ const ProductManager = () => {
     fetchProducts();
   }, []);
 
-  // Debug preview URLs and product photos
+
   useEffect(() => {
     console.log('addPreviewUrls:', addPreviewUrls);
     console.log('editPreviewUrls:', editPreviewUrls);
@@ -79,22 +79,26 @@ const ProductManager = () => {
     data.append('price', addFormData.price);
     data.append('colors', addFormData.colors);
     data.append('category', addFormData.category);
+    data.append('description',addFormData.description)
     addFormData.photos.forEach((photo) => {
       data.append('photos', photo);
     });
 
-    fetch(`${API_BASE_URL}/api/products/add-product`, {
+
+    fetch('http://localhost:5000/api/products/add-product', {
       method: 'POST',
       body: data,
     })
       .then((res) => {
         if (res.ok) {
           alert('Product added successfully!');
+          console.log("sss",addFormData)
           setAddFormData({
             name: '',
             price: '',
             colors: '',
             category: '',
+            description:'',
             photos: [],
           });
           setAddPreviewUrls([]);
@@ -111,11 +115,27 @@ const ProductManager = () => {
       });
   };
 
-  // Handle edit button click
+const handleAddToSale = (product) => {
+  fetch('http://localhost:5000/api/products/add-sale', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ _id: product._id }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('Product marked as on sale:', data);
+      // Optionally update state or show toast
+    })
+    .catch((err) => console.error('Error:', err));
+};
+
   const handleEditClick = (product) => {
     setEditingProductId(product._id);
     setEditFormData({
       name: product.name,
+       description:product.description,
       price: product.price,
       colors: product.colors.join(', '),
       category: product.category,
@@ -124,7 +144,7 @@ const ProductManager = () => {
     setEditPreviewUrls(
       product.photos.map((p) => ({
         id: uuidv4(),
-        url: `${API_BASE_URL}/${p.startsWith('/') ? p.slice(1) : p}`,
+        url: `http://localhost:5000/${p.startsWith('/') ? p.slice(1) : p}`,
       }))
     );
   };
@@ -152,6 +172,7 @@ const ProductManager = () => {
 
     const data = new FormData();
     data.append('name', editFormData.name);
+    data.append('description',editFormData.description)
     data.append('price', editFormData.price);
     data.append('colors', editFormData.colors);
     data.append('category', editFormData.category);
@@ -159,7 +180,7 @@ const ProductManager = () => {
       data.append('photos', photo);
     });
 
-    fetch(`${API_BASE_URL}/api/products/${editingProductId}`, {
+    fetch(`http://localhost:5000/api/products/${editingProductId}`, {
       method: 'PUT',
       body: data,
     })
@@ -172,6 +193,7 @@ const ProductManager = () => {
             price: '',
             colors: '',
             category: '',
+             description:'',
             photos: [],
           });
           setEditPreviewUrls([]);
@@ -188,12 +210,13 @@ const ProductManager = () => {
       });
   };
 
-  // Cancel editing
+
   const handleCancelEdit = () => {
     setEditingProductId(null);
     setEditFormData({
       name: '',
       price: '',
+       description:'',
       colors: '',
       category: '',
       photos: [],
@@ -201,11 +224,11 @@ const ProductManager = () => {
     setEditPreviewUrls([]);
   };
 
-  // Handle product deletion
+  
   const handleRemove = (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
 
-    fetch(`${API_BASE_URL}/api/products/${id}`, {
+    fetch(`http://localhost:5000/api/products/${id}`, {
       method: 'DELETE',
     })
       .then((res) => {
@@ -224,15 +247,32 @@ const ProductManager = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Add New Product</h1>
+    <div style={{ maxWidth: 900, margin: '30px auto', fontFamily: "'Inter', sans-serif", color: '#333' }}>
+      <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 30, color: '#1a1a1a' }}>
+        Add New Product
+      </h1>
+      
       <form
         onSubmit={handleAddSubmit}
         encType="multipart/form-data"
-        className="bg-white p-6 rounded-xl shadow-lg mb-12"
+        style={{
+          background: '#fff',
+          padding: 30,
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          marginBottom: 40,
+        }}
       >
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div style={{ marginBottom: 20 }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '1rem',
+              fontWeight: 500,
+              marginBottom: 8,
+              color: '#444',
+            }}
+          >
             Product Name
             <input
               type="text"
@@ -240,13 +280,31 @@ const ProductManager = () => {
               value={addFormData.name}
               onChange={handleAddChange}
               required
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              style={{
+                width: '100%',
+                padding: 12,
+                fontSize: '1rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: 8,
+                outline: 'none',
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+              }}
+              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
             />
           </label>
         </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div style={{ marginBottom: 20 }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '1rem',
+              fontWeight: 500,
+              marginBottom: 8,
+              color: '#444',
+            }}
+          >
             Price
             <input
               type="number"
@@ -254,13 +312,31 @@ const ProductManager = () => {
               value={addFormData.price}
               onChange={handleAddChange}
               required
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              style={{
+                width: '100%',
+                padding: 12,
+                fontSize: '1rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: 8,
+                outline: 'none',
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+              }}
+              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
             />
           </label>
         </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div style={{ marginBottom: 20 }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '1rem',
+              fontWeight: 500,
+              marginBottom: 8,
+              color: '#444',
+            }}
+          >
             Colors (comma-separated)
             <input
               type="text"
@@ -269,20 +345,49 @@ const ProductManager = () => {
               onChange={handleAddChange}
               placeholder="e.g. Red, Blue, White"
               required
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              style={{
+                width: '100%',
+                padding: 12,
+                fontSize: '1rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: 8,
+                outline: 'none',
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+              }}
+              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
             />
           </label>
         </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div style={{ marginBottom: 20 }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '1rem',
+              fontWeight: 500,
+              marginBottom: 8,
+              color: '#444',
+            }}
+          >
             Category
             <select
               name="category"
               value={addFormData.category}
               onChange={handleAddChange}
               required
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              style={{
+                width: '100%',
+                padding: 12,
+                fontSize: '1rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: 8,
+                outline: 'none',
+                background: '#fff',
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+              }}
+              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
             >
               <option value="">Select a Category</option>
               <option value="AC Comforters">AC Comforters</option>
@@ -292,16 +397,67 @@ const ProductManager = () => {
               <option value="Essential Collection">Essential Collection</option>
             </select>
           </label>
+        </div> <div style={{ marginBottom: 20 }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '1rem',
+              fontWeight: 500,
+              marginBottom: 8,
+              color: '#444',
+            }}
+          >
+            Dscription
+            <textarea
+              name="description"
+              value={addFormData.description}
+              onChange={handleAddChange}
+              required
+              style={{
+                width: '100%',
+                padding: 12,
+                fontSize: '1rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: 8,
+                outline: 'none',
+                background: '#fff',
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+              }}
+              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+            >
+            </textarea>
+          </label>
         </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div style={{ marginBottom: 20 }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '1rem',
+              fontWeight: 500,
+              marginBottom: 8,
+              color: '#444',
+            }}
+          >
             Photos (multiple)
             <div
-              className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition"
-              onDragOver={(e) => e.preventDefault()}
-              onDragLeave={(e) => e.currentTarget.classList.remove('border-blue-500')}
-              onDrop={(e) => e.currentTarget.classList.remove('border-blue-500')}
+              style={{
+                border: '2px dashed #e0e0e0',
+                borderRadius: 8,
+                padding: 20,
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'border-color 0.3s ease',
+                background: '#f9fafb',
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.currentTarget.style.borderColor = '#4a90e2';
+              }}
+              onDragLeave={(e) => {
+                e.currentTarget.style.borderColor = '#e0e0e0';
+              }}
             >
               <input
                 type="file"
@@ -310,30 +466,42 @@ const ProductManager = () => {
                 accept="image/*"
                 onChange={handleAddChange}
                 required
-                className="hidden"
+                style={{ display: 'none' }}
                 id="photo-upload"
               />
               <label
                 htmlFor="photo-upload"
-                className="text-gray-500 cursor-pointer"
+                style={{
+                  display: 'block',
+                  fontSize: '0.9rem',
+                  color: '#666',
+                  cursor: 'pointer',
+                }}
               >
                 Drag and drop images here or click to upload
               </label>
             </div>
           </label>
-          <div className="flex flex-wrap gap-4 mt-4">
+          <div style={{ display: 'flex', gap: 12, marginTop: 15, flexWrap: 'wrap' }}>
             {addPreviewUrls.length === 0 && (
-              <p className="text-gray-500 text-sm">No images selected</p>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>No images selected</p>
             )}
             {addPreviewUrls.map((item) => (
               <div
                 key={item.id}
-                className="w-24 h-24 rounded-lg overflow-hidden shadow-md"
+                style={{
+                  position: 'relative',
+                  width: 100,
+                  height: 100,
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                }}
               >
                 <img
                   src={item.url}
                   alt={`preview-${item.id}`}
-                  className="w-full h-full object-cover"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   onError={(e) => {
                     console.error(`Failed to load image: ${item.url}`);
                     e.target.src = 'https://via.placeholder.com/100?text=Image+Not+Found';
@@ -346,27 +514,64 @@ const ProductManager = () => {
 
         <button
           type="submit"
-          className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+          style={{
+            padding: '12px 24px',
+            fontSize: '1rem',
+            fontWeight: 500,
+            background: '#4a90e2',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            cursor: 'pointer',
+            transition: 'background 0.3s ease, transform 0.2s ease',
+          }}
+          onMouseEnter={(e) => (e.target.style.background = '#357abd')}
+          onMouseLeave={(e) => (e.target.style.background = '#4a90e2')}
+          onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+          onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
         >
           Add Product
         </button>
       </form>
 
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Product List</h1>
-      <ul className="space-y-6">
+      <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 30, color: '#1a1a1a' }}>
+        Product List
+      </h1>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
         {products.map((product) => (
           <li
             key={product._id}
-            className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
+         
+            style={{
+              border: '1px solid #e0e0e0',
+              marginBottom: 20,
+              borderRadius: 8,
+              padding: 15,
+              background: '#fff',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
+            }}
           >
             {editingProductId === product._id ? (
               <form
                 onSubmit={handleEditSubmit}
                 encType="multipart/form-data"
-                className="bg-white p-6 rounded-xl shadow-inner"
+                style={{
+                  background: '#fff',
+                  padding: 20,
+                  borderRadius: 8,
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                }}
               >
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div style={{ marginBottom: 20 }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      color: '#444',
+                    }}
+                  >
                     Product Name
                     <input
                       type="text"
@@ -374,12 +579,30 @@ const ProductManager = () => {
                       value={editFormData.name}
                       onChange={handleEditChange}
                       required
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      style={{
+                        width: '100%',
+                        padding: 12,
+                        fontSize: '1rem',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 8,
+                        outline: 'none',
+                        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+                      onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
                     />
                   </label>
                 </div>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div style={{ marginBottom: 20 }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      color: '#444',
+                    }}
+                  >
                     Price
                     <input
                       type="number"
@@ -387,12 +610,30 @@ const ProductManager = () => {
                       value={editFormData.price}
                       onChange={handleEditChange}
                       required
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      style={{
+                        width: '100%',
+                        padding: 12,
+                        fontSize: '1rem',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 8,
+                        outline: 'none',
+                        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+                      onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
                     />
                   </label>
                 </div>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div style={{ marginBottom: 20 }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      color: '#444',
+                    }}
+                  >
                     Colors (comma-separated)
                     <input
                       type="text"
@@ -400,19 +641,48 @@ const ProductManager = () => {
                       value={editFormData.colors}
                       onChange={handleEditChange}
                       required
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      style={{
+                        width: '100%',
+                        padding: 12,
+                        fontSize: '1rem',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 8,
+                        outline: 'none',
+                        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+                      onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
                     />
                   </label>
                 </div>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div style={{ marginBottom: 20 }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      color: '#444',
+                    }}
+                  >
                     Category
                     <select
                       name="category"
                       value={editFormData.category}
                       onChange={handleEditChange}
                       required
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                      style={{
+                        width: '100%',
+                        padding: 12,
+                        fontSize: '1rem',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 8,
+                        outline: 'none',
+                        background: '#fff',
+                        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+                      onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
                     >
                       <option value="">Select a Category</option>
                       <option value="AC Comforters">AC Comforters</option>
@@ -423,14 +693,34 @@ const ProductManager = () => {
                     </select>
                   </label>
                 </div>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div style={{ marginBottom: 20 }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      marginBottom: 8,
+                      color: '#444',
+                    }}
+                  >
                     Photos (optional to replace)
                     <div
-                      className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition"
-                      onDragOver={(e) => e.preventDefault()}
-                      onDragLeave={(e) => e.currentTarget.classList.remove('border-blue-500')}
-                      onDrop={(e) => e.currentTarget.classList.remove('border-blue-500')}
+                      style={{
+                        border: '2px dashed #e0e0e0',
+                        borderRadius: 8,
+                        padding: 20,
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        transition: 'border-color 0.3s ease',
+                        background: '#f9fafb',
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.style.borderColor = '#4a90e2';
+                      }}
+                      onDragLeave={(e) => {
+                        e.currentTarget.style.borderColor = '#e0e0e0';
+                      }}
                     >
                       <input
                         type="file"
@@ -438,30 +728,42 @@ const ProductManager = () => {
                         multiple
                         accept="image/*"
                         onChange={handleEditChange}
-                        className="hidden"
+                        style={{ display: 'none' }}
                         id="edit-photo-upload"
                       />
                       <label
                         htmlFor="edit-photo-upload"
-                        className="text-gray-500 cursor-pointer"
+                        style={{
+                          display: 'block',
+                          fontSize: '0.9rem',
+                          color: '#666',
+                          cursor: 'pointer',
+                        }}
                       >
                         Drag and drop images here or click to upload
                       </label>
                     </div>
                   </label>
-                  <div className="flex flex-wrap gap-4 mt-4">
+                  <div style={{ display: 'flex', gap: 12, marginTop: 15, flexWrap: 'wrap' }}>
                     {editPreviewUrls.length === 0 && (
-                      <p className="text-gray-500 text-sm">No images selected</p>
+                      <p style={{ color: '#666', fontSize: '0.9rem' }}>No images selected</p>
                     )}
                     {editPreviewUrls.map((item) => (
                       <div
                         key={item.id}
-                        className="w-24 h-24 rounded-lg overflow-hidden shadow-md"
+                        style={{
+                          position: 'relative',
+                          width: 100,
+                          height: 100,
+                          borderRadius: 8,
+                          overflow: 'hidden',
+                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                        }}
                       >
                         <img
                           src={item.url}
                           alt={`edit-preview-${item.id}`}
-                          className="w-full h-full object-cover"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           onError={(e) => {
                             console.error(`Failed to load image: ${item.url}`);
                             e.target.src = 'https://via.placeholder.com/100?text=Image+Not+Found';
@@ -471,57 +773,145 @@ const ProductManager = () => {
                     ))}
                   </div>
                 </div>
-                <div className="flex gap-4">
-                  <button
-                    type="submit"
-                    className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCancelEdit}
-                    className="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '12px 24px',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    background: '#4a90e2',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    marginRight: 10,
+                    transition: 'background 0.3s ease, transform 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => (e.target.style.background = '#357abd')}
+                  onMouseLeave={(e) => (e.target.style.background = '#4a90e2')}
+                  onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                  onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  style={{
+                    padding: '12px 24px',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    background: '#e0e0e0',
+                    color: '#333',
+                    border: 'none',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    transition: 'background 0.3s ease, transform 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => (e.target.style.background = '#d0d0d0')}
+                  onMouseLeave={(e) => (e.target.style.background = '#e0e0e0')}
+                  onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                  onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+                >
+                  Cancel
+                </button>
               </form>
             ) : (
               <>
-                <h2 className="text-xl font-semibold text-gray-800 mb-3">{product.name}</h2>
-                <p className="text-gray-600">Price: ${product.price}</p>
-                <p className="text-gray-600">Colors: {product.colors.join(', ')}</p>
-                <p className="text-gray-600">Category: {product.category}</p>
-                <div className="flex flex-wrap gap-4 mt-4">
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 900, margin: '0 0 10px' }}>
+                  {product.name}
+                </h2>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 500, margin: '0 0 10px' }}>
+                  {product.description} hi
+                </h2>
+             <h1>
+  {new Date(product.createAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })}
+</h1>
+
+                <p>Price: ${product.price}</p>
+                <p>Colors: {product.colors.join(', ')}</p>
+                <p>Category: {product.category}</p>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
                   {product.photos.length === 0 && (
-                    <p className="text-gray-500 text-sm">No images available</p>
+                    <p style={{ color: '#666', fontSize: '0.9rem' }}>No images available</p>
                   )}
-                  {product.photos.map((photo, index) => (
-                    <img
-                      key={index}
-                      src={photo}
-                      alt={`Product ${index + 1}`}
-                      className="w-24 h-24 object-cover rounded-lg shadow-md hover:scale-105 transition"
-                      onError={(e) => {
-                        console.error(`Failed to load image: ${photo}`);
-                        e.target.src = 'https://via.placeholder.com/100?text=Image+Not+Found';
-                      }}
-                    />
-                  ))}
+                {product.photos.map((photo, index) => (
+  <img
+    key={index}
+    src={photo} 
+    alt={`Product ${index + 1}`}
+    className="w-full h-80 object-cover rounded-2xl shadow-lg transition-transform duration-300 hover:scale-105"
+    loading="lazy"
+    onError={(e) => { e.target.style.display = 'none'; }}
+  />
+))}
+
                 </div>
-                <div className="mt-4 flex gap-4">
+                <div style={{ marginTop: 10 }}>
                   <button
                     onClick={() => handleEditClick(product)}
-                    className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      background: '#4a90e2',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      marginRight: 10,
+                      transition: 'background 0.3s ease, transform 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => (e.target.style.background = '#357abd')}
+                    onMouseLeave={(e) => (e.target.style.background = '#4a90e2')}
+                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleRemove(product._id)}
-                    className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition"
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      background: '#e63946',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      transition: 'background 0.3s ease, transform 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
+                    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
+                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
                   >
                     Remove
+                  </button>
+                  <button
+                    onClick={() =>handleAddToSale(product)}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      background: 'green',
+                      color: 'black',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      transition: 'background 0.3s ease, transform 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
+                    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
+                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+                  >
+                   Add to sale
                   </button>
                 </div>
               </>
