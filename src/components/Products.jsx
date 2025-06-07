@@ -708,6 +708,26 @@ const handleAddToSale = (product) => {
                   >
                     Remove
                   </button>
+                  <button
+                    onClick={() =>handleAddToSale(product)}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      background: 'green',
+                      color: 'black',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      transition: 'background 0.3s ease, transform 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
+                    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
+                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+                  >
+                   Add to sale
+                  </button>
                 </div>
               </>
             )}
