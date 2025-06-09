@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-// Define API base URL using environment variable with fallback
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 const ProductManager = () => {
   const [products, setProducts] = useState([]);
+  
   const [addFormData, setAddFormData] = useState({
     name: '',
     price: '',
     colors: '',
     category: '',
+    description:'',
     photos: [],
   });
   const [addPreviewUrls, setAddPreviewUrls] = useState([]);
@@ -19,11 +22,12 @@ const ProductManager = () => {
     price: '',
     colors: '',
     category: '',
+     description:'',
     photos: [],
   });
   const [editPreviewUrls, setEditPreviewUrls] = useState([]);
 
-  // Fetch products from the server
+  
   const fetchProducts = () => {
     fetch(`${API_BASE_URL}/api/products`)
       .then((res) => res.json())
@@ -38,7 +42,7 @@ const ProductManager = () => {
     fetchProducts();
   }, []);
 
-  // Debug preview URLs and product photos
+
   useEffect(() => {
     console.log('addPreviewUrls:', addPreviewUrls);
     console.log('editPreviewUrls:', editPreviewUrls);
@@ -47,7 +51,6 @@ const ProductManager = () => {
     });
   }, [addPreviewUrls, editPreviewUrls, products]);
 
-  // Clean up object URLs to prevent memory leaks
   useEffect(() => {
     return () => {
       addPreviewUrls.forEach((item) => URL.revokeObjectURL(item.url));
@@ -55,7 +58,7 @@ const ProductManager = () => {
     };
   }, [addPreviewUrls, editPreviewUrls]);
 
-  // Handle input changes for adding a product
+  
   const handleAddChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'photos') {
@@ -71,7 +74,7 @@ const ProductManager = () => {
     }
   };
 
-  // Handle form submission for adding a product
+  
   const handleAddSubmit = (e) => {
     e.preventDefault();
     const data = new FormData();
@@ -79,6 +82,7 @@ const ProductManager = () => {
     data.append('price', addFormData.price);
     data.append('colors', addFormData.colors);
     data.append('category', addFormData.category);
+    data.append('description',addFormData.description)
     addFormData.photos.forEach((photo) => {
       data.append('photos', photo);
     });
@@ -90,11 +94,13 @@ const ProductManager = () => {
       .then((res) => {
         if (res.ok) {
           alert('Product added successfully!');
+          console.log("sss",addFormData)
           setAddFormData({
             name: '',
             price: '',
             colors: '',
             category: '',
+            description:'',
             photos: [],
           });
           setAddPreviewUrls([]);
@@ -111,11 +117,26 @@ const ProductManager = () => {
       });
   };
 
-  // Handle edit button click
+const handleAddToSale = (product) => {
+  fetch(`${API_BASE_URL}/api/products/add-sale`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ _id: product._id }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('Product marked as on sale:', data);
+   
+    })
+    .catch((err) => console.error('Error:', err));
+
   const handleEditClick = (product) => {
     setEditingProductId(product._id);
     setEditFormData({
       name: product.name,
+       description:product.description,
       price: product.price,
       colors: product.colors.join(', '),
       category: product.category,
@@ -129,7 +150,7 @@ const ProductManager = () => {
     );
   };
 
-  // Handle input changes for editing a product
+
   const handleEditChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'photos') {
@@ -145,13 +166,13 @@ const ProductManager = () => {
     }
   };
 
-  // Handle form submission for editing a product
   const handleEditSubmit = (e) => {
     e.preventDefault();
     if (!editingProductId) return;
 
     const data = new FormData();
     data.append('name', editFormData.name);
+    data.append('description',editFormData.description)
     data.append('price', editFormData.price);
     data.append('colors', editFormData.colors);
     data.append('category', editFormData.category);
@@ -172,6 +193,7 @@ const ProductManager = () => {
             price: '',
             colors: '',
             category: '',
+             description:'',
             photos: [],
           });
           setEditPreviewUrls([]);
@@ -188,12 +210,13 @@ const ProductManager = () => {
       });
   };
 
-  // Cancel editing
+
   const handleCancelEdit = () => {
     setEditingProductId(null);
     setEditFormData({
       name: '',
       price: '',
+       description:'',
       colors: '',
       category: '',
       photos: [],
@@ -201,7 +224,7 @@ const ProductManager = () => {
     setEditPreviewUrls([]);
   };
 
-  // Handle product deletion
+  
   const handleRemove = (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
 
@@ -221,11 +244,29 @@ const ProductManager = () => {
         console.error('Delete product error:', err);
         alert(`Failed to delete product: ${err.message}`);
       });
-  };
+  };};
+  const handleremoveToSale = (product) => {
+  fetch(`${API_BASE_URL}/api/products/remove-sale`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ _id: product._id }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('Product marked as off on  sale:', data);
+     
+    })
+    .catch((err) => console.error('Error:', err));
+};
+
 
   return (
+
     <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Add New Product</h1>
+
       <form
         onSubmit={handleAddSubmit}
         encType="multipart/form-data"
@@ -292,6 +333,37 @@ const ProductManager = () => {
               <option value="Essential Collection">Essential Collection</option>
             </select>
           </label>
+        </div> <div style={{ marginBottom: 20 }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '1rem',
+              fontWeight: 500,
+              marginBottom: 8,
+              color: '#444',
+            }}
+          >
+            Dscription
+            <textarea
+              name="description"
+              value={addFormData.description}
+              onChange={handleAddChange}
+              required
+              style={{
+                width: '100%',
+                padding: 12,
+                fontSize: '1rem',
+                border: '1px solid #e0e0e0',
+                borderRadius: 8,
+                outline: 'none',
+                background: '#fff',
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+              }}
+              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
+              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+            >
+            </textarea>
+          </label>
         </div>
 
         <div className="mb-6">
@@ -352,9 +424,13 @@ const ProductManager = () => {
         </button>
       </form>
 
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Product List</h1>
-      <ul className="space-y-6">
-        {products.map((product) => (
+
+      <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 30, color: '#1a1a1a' }}>
+        Product List
+      </h1>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+         {products.map((product) => (
+
           <li
             key={product._id}
             className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
@@ -520,9 +596,54 @@ const ProductManager = () => {
                   <button
                     onClick={() => handleRemove(product._id)}
                     className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition"
+
                   >
                     Remove
                   </button>
+                  <button
+                    onClick={() =>handleAddToSale(product)}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      background: 'green',
+                      color: 'black',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      transition: 'background 0.3s ease, transform 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
+                    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
+                    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+                    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+
+                  >
+                   Add to sale
+                  </button>
+                 
+  <button
+    onClick={() => handleremoveToSale(product)}
+    style={{
+      padding: '8px 16px',
+      fontSize: '1rem',
+      fontWeight: 500,
+      background: 'green',
+      color: 'black',
+      border: 'none',
+      borderRadius: 8,
+      cursor: 'pointer',
+      transition: 'background 0.3s ease, transform 0.2s ease',
+    }}
+    onMouseEnter={(e) => (e.target.style.background = '#d00000')}
+    onMouseLeave={(e) => (e.target.style.background = '#e63946')}
+    onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
+    onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+  >
+    Remove from Sale
+  </button>
+
+
                 </div>
               </>
             )}
