@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 function Adduser() {
   const [formData, setFormData] = useState({
     name: '',
@@ -29,7 +30,7 @@ const handleSubmit = async (e) => {
 
     if (response.ok) {
       alert('User added successfully!');
-      setFormData({ name: '', email: '', password: '' }); // reset form
+      setFormData({ name: '', email: '', password: '' }); 
     } else {
       alert(`Error: ${data.message}`);
     }

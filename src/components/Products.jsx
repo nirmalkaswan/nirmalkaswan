@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 const ProductManager = () => {
   const [products, setProducts] = useState([]);
   
@@ -84,7 +86,6 @@ const ProductManager = () => {
     addFormData.photos.forEach((photo) => {
       data.append('photos', photo);
     });
-
 
     fetch(`${API_BASE_URL}/api/products/add-product`, {
       method: 'POST',
@@ -262,32 +263,17 @@ const handleAddToSale = (product) => {
 
 
   return (
-    <div style={{ maxWidth: 900, margin: '30px auto', fontFamily: "'Inter', sans-serif", color: '#333' }}>
-      <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 30, color: '#1a1a1a' }}>
-        Add New Product
-      </h1>
-      
+
+    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Add New Product</h1>
+
       <form
         onSubmit={handleAddSubmit}
         encType="multipart/form-data"
-        style={{
-          background: '#fff',
-          padding: 30,
-          borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          marginBottom: 40,
-        }}
+        className="bg-white p-6 rounded-xl shadow-lg mb-12"
       >
-        <div style={{ marginBottom: 20 }}>
-          <label
-            style={{
-              display: 'block',
-              fontSize: '1rem',
-              fontWeight: 500,
-              marginBottom: 8,
-              color: '#444',
-            }}
-          >
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Product Name
             <input
               type="text"
@@ -295,31 +281,13 @@ const handleAddToSale = (product) => {
               value={addFormData.name}
               onChange={handleAddChange}
               required
-              style={{
-                width: '100%',
-                padding: 12,
-                fontSize: '1rem',
-                border: '1px solid #e0e0e0',
-                borderRadius: 8,
-                outline: 'none',
-                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-              }}
-              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
-              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
             />
           </label>
         </div>
 
-        <div style={{ marginBottom: 20 }}>
-          <label
-            style={{
-              display: 'block',
-              fontSize: '1rem',
-              fontWeight: 500,
-              marginBottom: 8,
-              color: '#444',
-            }}
-          >
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Price
             <input
               type="number"
@@ -327,31 +295,13 @@ const handleAddToSale = (product) => {
               value={addFormData.price}
               onChange={handleAddChange}
               required
-              style={{
-                width: '100%',
-                padding: 12,
-                fontSize: '1rem',
-                border: '1px solid #e0e0e0',
-                borderRadius: 8,
-                outline: 'none',
-                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-              }}
-              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
-              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
             />
           </label>
         </div>
 
-        <div style={{ marginBottom: 20 }}>
-          <label
-            style={{
-              display: 'block',
-              fontSize: '1rem',
-              fontWeight: 500,
-              marginBottom: 8,
-              color: '#444',
-            }}
-          >
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Colors (comma-separated)
             <input
               type="text"
@@ -360,49 +310,20 @@ const handleAddToSale = (product) => {
               onChange={handleAddChange}
               placeholder="e.g. Red, Blue, White"
               required
-              style={{
-                width: '100%',
-                padding: 12,
-                fontSize: '1rem',
-                border: '1px solid #e0e0e0',
-                borderRadius: 8,
-                outline: 'none',
-                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-              }}
-              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
-              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
             />
           </label>
         </div>
 
-        <div style={{ marginBottom: 20 }}>
-          <label
-            style={{
-              display: 'block',
-              fontSize: '1rem',
-              fontWeight: 500,
-              marginBottom: 8,
-              color: '#444',
-            }}
-          >
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Category
             <select
               name="category"
               value={addFormData.category}
               onChange={handleAddChange}
               required
-              style={{
-                width: '100%',
-                padding: 12,
-                fontSize: '1rem',
-                border: '1px solid #e0e0e0',
-                borderRadius: 8,
-                outline: 'none',
-                background: '#fff',
-                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-              }}
-              onFocus={(e) => (e.target.style.borderColor = '#4a90e2')}
-              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
             >
               <option value="">Select a Category</option>
               <option value="AC Comforters">AC Comforters</option>
@@ -445,34 +366,14 @@ const handleAddToSale = (product) => {
           </label>
         </div>
 
-        <div style={{ marginBottom: 20 }}>
-          <label
-            style={{
-              display: 'block',
-              fontSize: '1rem',
-              fontWeight: 500,
-              marginBottom: 8,
-              color: '#444',
-            }}
-          >
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Photos (multiple)
             <div
-              style={{
-                border: '2px dashed #e0e0e0',
-                borderRadius: 8,
-                padding: 20,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'border-color 0.3s ease',
-                background: '#f9fafb',
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.currentTarget.style.borderColor = '#4a90e2';
-              }}
-              onDragLeave={(e) => {
-                e.currentTarget.style.borderColor = '#e0e0e0';
-              }}
+              className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition"
+              onDragOver={(e) => e.preventDefault()}
+              onDragLeave={(e) => e.currentTarget.classList.remove('border-blue-500')}
+              onDrop={(e) => e.currentTarget.classList.remove('border-blue-500')}
             >
               <input
                 type="file"
@@ -481,42 +382,30 @@ const handleAddToSale = (product) => {
                 accept="image/*"
                 onChange={handleAddChange}
                 required
-                style={{ display: 'none' }}
+                className="hidden"
                 id="photo-upload"
               />
               <label
                 htmlFor="photo-upload"
-                style={{
-                  display: 'block',
-                  fontSize: '0.9rem',
-                  color: '#666',
-                  cursor: 'pointer',
-                }}
+                className="text-gray-500 cursor-pointer"
               >
                 Drag and drop images here or click to upload
               </label>
             </div>
           </label>
-          <div style={{ display: 'flex', gap: 12, marginTop: 15, flexWrap: 'wrap' }}>
+          <div className="flex flex-wrap gap-4 mt-4">
             {addPreviewUrls.length === 0 && (
-              <p style={{ color: '#666', fontSize: '0.9rem' }}>No images selected</p>
+              <p className="text-gray-500 text-sm">No images selected</p>
             )}
             {addPreviewUrls.map((item) => (
               <div
                 key={item.id}
-                style={{
-                  position: 'relative',
-                  width: 100,
-                  height: 100,
-                  borderRadius: 8,
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                }}
+                className="w-24 h-24 rounded-lg overflow-hidden shadow-md"
               >
                 <img
                   src={item.url}
                   alt={`preview-${item.id}`}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  className="w-full h-full object-cover"
                   onError={(e) => {
                     console.error(`Failed to load image: ${item.url}`);
                     e.target.src = 'https://via.placeholder.com/100?text=Image+Not+Found';
@@ -529,31 +418,19 @@ const handleAddToSale = (product) => {
 
         <button
           type="submit"
-          style={{
-            padding: '12px 24px',
-            fontSize: '1rem',
-            fontWeight: 500,
-            background: '#4a90e2',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            cursor: 'pointer',
-            transition: 'background 0.3s ease, transform 0.2s ease',
-          }}
-          onMouseEnter={(e) => (e.target.style.background = '#357abd')}
-          onMouseLeave={(e) => (e.target.style.background = '#4a90e2')}
-          onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
-          onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+          className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
         >
           Add Product
         </button>
       </form>
+
 
       <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 30, color: '#1a1a1a' }}>
         Product List
       </h1>
       <ul style={{ listStyle: 'none', padding: 0 }}>
          {products.map((product) => (
+
           <li
             key={product._id}
             className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
@@ -719,6 +596,7 @@ const handleAddToSale = (product) => {
                   <button
                     onClick={() => handleRemove(product._id)}
                     className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition"
+
                   >
                     Remove
                   </button>
@@ -739,6 +617,7 @@ const handleAddToSale = (product) => {
                     onMouseLeave={(e) => (e.target.style.background = '#e63946')}
                     onMouseDown={(e) => (e.target.style.transform = 'scale(0.98)')}
                     onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
+
                   >
                    Add to sale
                   </button>
